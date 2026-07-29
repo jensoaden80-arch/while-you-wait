@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Tan Mon Cheri';
+  src: url('/fonts/tan-mon-cheri.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'The Seasons';
+  src: url('/fonts/TheSeasons-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'CQ Optima';
+  src: url('/fonts/Optima_Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-cq-bg: #08080b;
+  --color-cq-cream: #f5f1e8;
+  --color-cq-olive: #8a8560;
+  --color-cq-border: rgba(245, 241, 232, 0.12);
+  --color-cq-border-hover: rgba(245, 241, 232, 0.32);
+  --font-tan-mon-cheri: 'Tan Mon Cheri', Georgia, 'Times New Roman', serif;
+  --font-seasons: 'The Seasons', Georgia, 'Times New Roman', serif;
+  --font-body: 'CQ Optima', 'Optima', 'Trebuchet MS', 'Gill Sans', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-cq-bg text-cq-cream font-body antialiased selection:bg-cq-cream/20 selection:text-cq-cream;
+  }
+}
+
+.grain {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.letterbox {
+  @apply relative overflow-hidden;
+}
+
+.letterbox::before,
+.letterbox::after {
+  content: '';
+  @apply absolute left-0 right-0 h-12 bg-cq-bg z-10;
+}
+
+.letterbox::before { @apply top-0; }
+.letterbox::after { @apply bottom-0; }
+
+.polaroid-frame {
+  @apply bg-white p-4 shadow-xl border border-black/5;
+}
+
+/* Tier 0 — transition / section-breaker screens only. Keep short, huge, and
+   surrounded by empty space; never stack directly against a Tier 1 heading. */
+.font-display {
+  font-family: var(--font-tan-mon-cheri);
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0.01em;
+  /* This font substitutes a decorative mark for certain letters (seen on "t")
+     when any of its GSUB features are on, which reads as a typo at display
+     size — force plain letterforms by disabling every feature the font
+     defines (aalt, dlig, frac, liga, ordn, salt, sups), not just ligatures. */
+  font-variant-ligatures: none;
+  font-variant-numeric: normal;
+  font-feature-settings: "liga" 0, "clig" 0, "calt" 0, "dlig" 0, "aalt" 0, "frac" 0, "ordn" 0, "salt" 0, "sups" 0;
+  text-rendering: optimizeSpeed;
+}
+
+/* Tier 1 — chapter headings / section titles */
+.font-heading {
+  font-family: var(--font-seasons);
+  font-style: normal;
+  font-weight: bold;
+}
+
+/* Tier 1 — reserved for genuine quotes/editorial asides, not plain sub-headers */
+.font-heading-italic {
+  font-family: var(--font-seasons);
+  font-style: italic;
+  font-weight: bold;
+}
+
+/* Tier 2 — sub-headers under a Tier 1 heading. Brand book rule: prefer Optima
+   Bold over Seasons for sub-headers; Seasons stays reserved for real quotes. */
+.font-subhead {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.5;
+}
