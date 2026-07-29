@@ -5,40 +5,33 @@ import { Client } from '@notionhq/client';
 // NOTION_DATABASE_ID. The target database must be shared with the Notion
 // integration that owns NOTION_API_KEY. See NOTION_SETUP.md.
 
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-    });
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
   }
 
   const notionApiKey = process.env.NOTION_API_KEY;
   const databaseId = process.env.NOTION_DATABASE_ID;
 
   if (!notionApiKey || !databaseId) {
-    return new Response(
-      JSON.stringify({
-        success: true,
-        notice: 'Submission received but not logged. Set NOTION_API_KEY and NOTION_DATABASE_ID in Vercel settings to record it in Notion.',
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+    res.status(200).json({
+      success: true,
+      notice: 'Submission received but not logged. Set NOTION_API_KEY and NOTION_DATABASE_ID in Vercel settings to record it in Notion.',
+    });
+    return;
   }
 
   try {
-    const body = await req.json();
+    const body = req.body ?? {};
     const notion = new Client({ auth: notionApiKey });
 
     const richText = (value: string) => [{ text: { content: value } }];
@@ -57,18 +50,10 @@ export default async function handler(req: Request) {
       } as any,
     });
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.status(200).json({ success: true });
   } catch (error: any) {
     console.error('Failed to log submission to Notion:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: error.message || 'Submission error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    res.status(500).json({ success: false, error: error.message || 'Submission error' });
   }
 }
